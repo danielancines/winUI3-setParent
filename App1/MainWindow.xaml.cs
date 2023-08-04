@@ -33,16 +33,34 @@ namespace App1
         [DllImport("user32.dll", SetLastError = true)]
         private static extern IntPtr SetParent(IntPtr child, IntPtr parent);
 
+        [DllImport("user32.dll")]
+        private static extern IntPtr SetWindowLong(IntPtr hWnd, int nIndex, long dwNewLong);
+
+
+        IntPtr parentWindowHandle, childWindowHandle;
         private void myButton_Click(object sender, RoutedEventArgs e)
         {
-            var parentWindowHandle = WinRT.Interop.WindowNative.GetWindowHandle(this);
+            this.parentWindowHandle = WinRT.Interop.WindowNative.GetWindowHandle(this);
 
             var childWindow = new Window { Content = new Border { Background = new SolidColorBrush(Colors.Blue) } };
+            this.childWindowHandle = WinRT.Interop.WindowNative.GetWindowHandle(childWindow);
+
+            SetWindowLong(this.childWindowHandle, -16, 0x00040000L | 0x00c00000L);
+
             childWindow.Activate();
 
-            var childWindowHandle = WinRT.Interop.WindowNative.GetWindowHandle(childWindow);
 
-            SetParent(childWindowHandle, parentWindowHandle);
+        }
+
+        private void myButton1_Click(object sender, RoutedEventArgs e)
+        {
+            SetWindowLong(this.childWindowHandle, -16, 0x00040000L | 0x00c00000L);
+        }
+
+        private void myButton2_Click(object sender, RoutedEventArgs e)
+        {
+            SetParent(this.childWindowHandle, this.parentWindowHandle);
+
         }
     }
 }
